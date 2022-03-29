@@ -1,29 +1,50 @@
+const { faker } = require('@faker-js/faker');
 const bcrypt = require("bcryptjs")
 
-const password = "mypass123"
-const saltRounds = 10
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.l8gir.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+client.connect(async err => {
+    if (err) {
+        console.log(err.message)
+        return
+    }
+    console.log('Connected to MongoDB')
 
-const MongoClient = require("mongodb")
+    //Array to store all the names
+    const username = faker.name.findName();
+    const userpassword = faker.internet.password();
 
+    const saltRounds = 10
 
-const UserSchema = new MongoClient.Schema({
-  username: String,
-  password: String
-})
+    bcrypt.genSalt(saltRounds, function (saltError, salt){
+        if(saltError){
+            throw saltError
+        }else{
+            bcrypt.hash(userpassword, salt, function(hashError, hash){
+                if (hashError){
+                    throw hashError
+                }else {
+                    //console.log(hash)
+                    const hash_password = hash
+                    
+                    //console.log(new_password)
+                    
+                    client.db("utem").collection("sample_user").insertOne({
+                      user_name:username,
+                      user_password:hash_password,
+                    })
+                    .then(result => {
+                        console.log(result);
+                        console.log({
+                          "username":username},'\n',
+                          {"password":hash_password},'\n',
+                          )
+                    
+                    });
+                }
+            })
+        }
 
-module.exports = mongodb.model("User", UserSchema)
-
-bcrypt.genSalt(saltRounds, function (saltError, salt) {
-  if (saltError) {
-    throw saltError
-  } else {
-    bcrypt.hash(password, salt, function(hashError, hash) {
-      if (hashError) {
-        throw hashError
-      } else {
-        console.log(hash)
-        //$2a$10$FEBywZh8u9M0Cec/0mWep.1kXrwKeiWDba6tdKvDfEBjyePJnDT7K
-      }
     })
-  }
-})
+});
