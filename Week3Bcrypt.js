@@ -11,7 +11,7 @@ client.connect(async err => {
     }
     console.log('Connected to MongoDB')
 
-    //Array to store all the names
+    
     const username = faker.name.findName();
     const userpassword = faker.internet.password();
 
