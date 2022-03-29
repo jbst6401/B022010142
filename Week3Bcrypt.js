@@ -25,10 +25,7 @@ client.connect(async err => {
                 if (hashError){
                     throw hashError
                 }else {
-                    //console.log(hash)
                     const hash_password = hash
-                    
-                    //console.log(new_password)
                     
                     client.db("utem").collection("sample_user").insertOne({
                       user_name:username,
